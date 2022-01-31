@@ -1,1 +1,2 @@
 # deploy_backup
+Ansible playbook that deploys a script to collect and upload backups to remote HTTP server. Intended for use with [go-simple-upload-server](https://github.com/devusb/go-simple-upload-server).

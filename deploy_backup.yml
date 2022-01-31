@@ -1,0 +1,28 @@
+---
+- hosts: all
+  tasks:
+    - name: create backup script
+      blockinfile:
+        path: /usr/local/bin/create_backup_{{ backup_name }}.sh
+        create: yes
+        block: |
+          #!/bin/bash
+          tar cvzf /tmp/{{ backup_name }}.tar.gz {{ backup_files_list | wrap | join(' ') }}
+          curl -Ffile=@/tmp/{{ backup_name }}.tar.gz '{{ backup_url }}'
+          rm /tmp/{{ backup_name }}.tar.gz
+          logger "{{ backup_name }} backup completed $(date)"
+
+    - name: make backup script executable
+      file:
+        path: /usr/local/bin/create_backup_{{ backup_name }}.sh
+        state: file
+        mode: +x
+
+    - name: add cron job for file backup
+      cron:
+        name: backup job
+        minute: "0"
+        hour: "0"
+        weekday: "1"
+        job: "/usr/local/bin/create_backup_{{ backup_name }}.sh"
+
